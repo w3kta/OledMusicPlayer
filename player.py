@@ -7,16 +7,25 @@ import socket
 from luma.core.interface.serial import i2c
 from luma.core.render import canvas
 from luma.oled.device import sh1106
-from gpiozero import Button
+import RPi.GPIO as GPIO
 from PIL import ImageFont
 
-# Buttons
-up = Button(4)
-down = Button(17)
-enter = Button(27)
-back = Button(22)
-volumeup = Button(24)
-volumedown = Button(23)
+# Button GPIO Pin Setup
+up_pin = 4
+down_pin = 17
+enter_pin = 27
+back_pin = 22
+volumeup_pin = 24
+volumedown_pin = 23
+
+# Set up GPIO using BCM numbering
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(up_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(down_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(enter_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(back_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(volumeup_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(volumedown_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 # OLED setup
 serial = i2c(port=1, address=0x3C)
@@ -99,9 +108,9 @@ def draw_playback_screen():
         with canvas(device) as draw:
             draw.rectangle((0, 0, device.width, 10), fill="white")
             draw.text((0, 0), playback_state["title"][:MAX_CHARACTERS], fill="black", font=font)
-            draw.text((0, 15), playback_state["artist"][:MAX_CHARACTERS], fill="white", font=font)
-            draw.text((0, 30), time_display, fill="white", font=font)
-            draw.text((0, 45), f"Vol: {vol}%", fill="white", font=font)
+            draw.text((0, 12), playback_state["artist"][:MAX_CHARACTERS], fill="white", font=font)
+            draw.text((35, 30), time_display, fill="white", font=font)
+            draw.text((42, 45), f"Vol: {vol}%", fill="white", font=font)
 
         if not playback_state["active"]:
             break
@@ -177,17 +186,17 @@ def play_folder_loop(entry_path, stop_button):
         start = time.time()
 
         while proc.poll() is None and playback_state["active"]:
-            if stop_button.is_pressed:
+            if GPIO.input(stop_button) == GPIO.LOW:
                 playback_state["active"] = False
                 proc.terminate()
                 break
 
-            if volumeup.is_pressed:
+            if GPIO.input(volumeup_pin) == GPIO.LOW:
                 adjust_volume(5)
                 set_mpv_volume(ipc_path, volume_percent)
                 time.sleep(0.1)
 
-            elif volumedown.is_pressed:
+            elif GPIO.input(volumedown_pin) == GPIO.LOW:
                 adjust_volume(-5)
                 set_mpv_volume(ipc_path, volume_percent)
                 time.sleep(0.1)
@@ -234,7 +243,7 @@ def main():
         draw_menu(current_path, entries, cursor_position, scroll_offset)
         time.sleep(0.05)
 
-        if up.is_pressed:
+        if GPIO.input(up_pin) == GPIO.LOW:
             if selected_index > 0:
                 selected_index -= 1
                 # If not at top of visible window, just move the cursor up.
@@ -245,7 +254,7 @@ def main():
                     scroll_offset -= 1
             time.sleep(0.1)
 
-        elif down.is_pressed:
+        elif GPIO.input(down_pin) == GPIO.LOW:
             if selected_index < len(entries) - 1:
                 selected_index += 1
                 # If cursor is not at the bottom of the screen, move it.
@@ -256,7 +265,7 @@ def main():
                     scroll_offset += 1
             time.sleep(0.1)
 
-        elif back.is_pressed and current_path != BASE_PATH:
+        elif GPIO.input(back_pin) == GPIO.LOW and current_path != BASE_PATH:
             current_path = os.path.dirname(current_path)
             # Reset selection variables when moving to a new directory.
             selected_index = 0
@@ -264,7 +273,7 @@ def main():
             scroll_offset = 0
             time.sleep(0.1)
 
-        elif enter.is_pressed:
+        elif GPIO.input(enter_pin) == GPIO.LOW:
             if entries:
                 entry_path = os.path.join(current_path, entries[selected_index])
                 if os.path.isdir(entry_path):
@@ -273,7 +282,7 @@ def main():
                     cursor_position = 0
                     scroll_offset = 0
                 elif entry_path.lower().endswith((".mp3", ".wav", ".flac")):
-                    play_folder_loop(entry_path, back)
+                    play_folder_loop(entry_path, back_pin)
             time.sleep(0.1)
 
 if __name__ == "__main__":
@@ -283,4 +292,5 @@ if __name__ == "__main__":
         print("Exiting gracefully...")
         playback_state["active"] = False
         device.clear()
+        GPIO.cleanup()
         time.sleep(0.2)
