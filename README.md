@@ -13,7 +13,7 @@
 
 ## Installation
 
-sudo apt update && sudo apt install -y \
+**sudo apt update && sudo apt install -y \
   python3-pip \
   python3-dev \
   libjpeg-dev \
@@ -24,7 +24,7 @@ sudo apt update && sudo apt install -y \
   i2c-tools \
   ffmpeg \
   mpv \
-  fonts-dejavu-core
+  fonts-dejavu-core**
 
 
 ## Python packages
