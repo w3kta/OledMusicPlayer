@@ -13,7 +13,8 @@ A minimalist headless FLAC player built on a Raspberry Pi Zero 2W, using GPIO bu
 1. Install OS by using an SD card and Raspberry Pi Imager
 2. SSH from terminal and create a VENV for python
 
-To install:
+## Installation
+
 sudo apt update && sudo apt install -y \
   python3-pip \
   python3-dev \
@@ -28,7 +29,7 @@ sudo apt update && sudo apt install -y \
   fonts-dejavu-core
 
 
-Pip install:
+## Python packages
 luma.oled
 gpiozero
 Pillow
