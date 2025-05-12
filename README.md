@@ -1,7 +1,5 @@
 # Raspberry Pi FLAC Player Project
 
-A minimalist headless FLAC player built on a Raspberry Pi Zero 2W, using GPIO buttons and an SH1106 OLED display. Audio output is handled by a HiFiBerry DAC (PCM5102A), and playback is managed with MPV.
-
 ---
 
 ## 🛠️ Used Hardware
@@ -31,8 +29,8 @@ sudo apt update && sudo apt install -y \
 
 ## Python packages
 
-**luma.oled**
-**gpiozero**
-**Pillow**
+- **luma.oled**
+- **gpiozero**
+- **Pillow**
 
 
