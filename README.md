@@ -30,8 +30,8 @@ sudo apt update && sudo apt install -y \
 
 
 ## Python packages
-luma.oled
-gpiozero
-Pillow
+**luma.oled
+**gpiozero
+**Pillow
 
 
