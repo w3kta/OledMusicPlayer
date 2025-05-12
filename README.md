@@ -45,3 +45,25 @@ Steps after SSH:
 3. Edit /etc/asound.conf and add:
    defaults.pcm.card 0
    defaults.ctl.card 0
+Wiring:
+OLED - Raspberry Pi Zero 2W
+
+VCC - 3,3V (PIN 1)
+GND - any free GND
+SCL - PIN 5
+SCA - PIN 3
+
+DAC - Raspberry Pi Zero 2W
+VIN - 5V Pin 2
+GND - any free GND
+LCK - PIN 35
+DIN - PIN 39
+BCK - PIN 12
+
+
+
+
+
+
+
+
